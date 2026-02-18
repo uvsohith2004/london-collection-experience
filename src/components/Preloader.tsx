@@ -6,14 +6,16 @@ interface PreloaderProps {
 }
 
 const Preloader = ({ onComplete }: PreloaderProps) => {
-  const [phase, setPhase] = useState<"line" | "logo" | "text" | "exit">("line");
+  const [phase, setPhase] = useState<"line" | "particles" | "logo" | "text" | "glow" | "exit">("line");
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("logo"), 1200);
-    const t2 = setTimeout(() => setPhase("text"), 2400);
-    const t3 = setTimeout(() => setPhase("exit"), 3800);
-    const t4 = setTimeout(onComplete, 4300);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+    const t1 = setTimeout(() => setPhase("particles"), 1800);
+    const t2 = setTimeout(() => setPhase("logo"), 3200);
+    const t3 = setTimeout(() => setPhase("text"), 5000);
+    const t4 = setTimeout(() => setPhase("glow"), 6500);
+    const t5 = setTimeout(() => setPhase("exit"), 7800);
+    const t6 = setTimeout(onComplete, 8300);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5); clearTimeout(t6); };
   }, [onComplete]);
 
   return (
@@ -36,11 +38,23 @@ const Preloader = ({ onComplete }: PreloaderProps) => {
             }}
             initial={{ width: 0, x: "-10%" }}
             animate={{ width: "120%", x: "-10%" }}
-            transition={{ duration: 1.2, ease: "easeInOut" }}
+            transition={{ duration: 1.8, ease: "easeInOut" }}
+          />
+
+          {/* Second energy line */}
+          <motion.div
+            className="absolute top-1/2 left-0 h-[1px] -translate-y-1/2 mt-2"
+            style={{
+              background: "linear-gradient(90deg, transparent, hsl(222 60% 40%), hsl(222 70% 55%), hsl(222 60% 40%), transparent)",
+              boxShadow: "0 0 15px hsl(222 60% 40% / 0.4)",
+            }}
+            initial={{ width: 0, x: "110%" }}
+            animate={{ width: "120%", x: "-10%" }}
+            transition={{ duration: 2.2, delay: 0.5, ease: "easeInOut" }}
           />
 
           {/* Particles */}
-          {phase !== "line" && Array.from({ length: 12 }).map((_, i) => (
+          {(phase === "particles" || phase === "logo" || phase === "text" || phase === "glow") && Array.from({ length: 20 }).map((_, i) => (
             <motion.div
               key={i}
               className="absolute rounded-full"
@@ -72,7 +86,7 @@ const Preloader = ({ onComplete }: PreloaderProps) => {
             className="relative z-10 flex flex-col items-center"
             initial={{ opacity: 0, scale: 0.8, filter: "blur(20px)" }}
             animate={
-              phase === "logo" || phase === "text"
+              phase === "logo" || phase === "text" || phase === "glow"
                 ? { opacity: 1, scale: 1, filter: "blur(0px)" }
                 : { opacity: 0, scale: 0.8, filter: "blur(20px)" }
             }
@@ -98,11 +112,24 @@ const Preloader = ({ onComplete }: PreloaderProps) => {
           <motion.p
             className="absolute bottom-[30%] font-body text-sm md:text-base tracking-widest text-muted-foreground italic"
             initial={{ opacity: 0, y: 20 }}
-            animate={phase === "text" ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            animate={phase === "text" || phase === "glow" ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
             Entering a World of Curated Luxury.
           </motion.p>
+
+          {/* Expanding glow ring */}
+          {phase === "glow" && (
+            <motion.div
+              className="absolute rounded-full"
+              style={{
+                background: "radial-gradient(ellipse, hsl(0 72% 40% / 0.15), transparent 70%)",
+              }}
+              initial={{ width: 100, height: 100, opacity: 0 }}
+              animate={{ width: 600, height: 600, opacity: [0, 0.6, 0.3] }}
+              transition={{ duration: 1.5, ease: "easeOut" }}
+            />
+          )}
         </motion.div>
       ) : null}
     </AnimatePresence>
