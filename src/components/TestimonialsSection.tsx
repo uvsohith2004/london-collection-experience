@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { Star } from "lucide-react";
+import { Star, Quote } from "lucide-react";
 
 const testimonials = [
   { name: "Fatima Al-Sabah", location: "Kuwait", text: "London Collection redefined what luxury means to me. Every piece feels like it was made just for me.", rating: 5 },
@@ -42,6 +42,14 @@ const TestimonialsSection = () => {
 
   return (
     <section className="relative py-24 overflow-hidden">
+      {/* Background ambient glow */}
+      <motion.div
+        className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[300px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(ellipse, hsl(var(--royal-blue-light) / 0.06), transparent 70%)" }}
+        animate={{ x: [0, 50, 0], opacity: [0.3, 0.5, 0.3] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+      />
+
       <div className="max-w-7xl mx-auto px-6 md:px-10 mb-16">
         <motion.div
           className="text-center"
@@ -50,16 +58,28 @@ const TestimonialsSection = () => {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="font-display text-3xl md:text-5xl text-foreground">
+          <motion.h2
+            className="font-display text-3xl md:text-5xl text-foreground"
+            initial={{ opacity: 0, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, filter: "blur(0px)" }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
             What Our Clients Say
-          </h2>
-          <div className="metallic-line max-w-xs mx-auto mt-6" />
+          </motion.h2>
+          <motion.div
+            className="metallic-line max-w-xs mx-auto mt-6"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          />
         </motion.div>
       </div>
 
       <div
         ref={scrollRef}
-        className="flex gap-6 overflow-hidden cursor-grab"
+        className="flex gap-6 overflow-hidden cursor-grab px-6"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
@@ -72,19 +92,36 @@ const TestimonialsSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: (i % 8) * 0.05 }}
-            whileHover={{ y: -4, transition: { duration: 0.3 } }}
+            whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.3 } }}
           >
-            {/* Red sweep on hover */}
+            {/* Quote icon */}
+            <motion.div
+              className="absolute top-4 right-4 text-primary/10"
+              initial={{ rotate: 0 }}
+              whileHover={{ rotate: 10, scale: 1.2 }}
+            >
+              <Quote size={30} />
+            </motion.div>
+
+            {/* Hover glow */}
             <div
               className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
               style={{
-                background: "linear-gradient(105deg, transparent 40%, hsl(var(--royal-red) / 0.06) 50%, transparent 60%)",
+                boxShadow: "inset 0 0 30px hsl(var(--royal-red) / 0.05)",
               }}
             />
 
             <div className="flex gap-1 mb-4">
               {Array.from({ length: t.rating }).map((_, j) => (
-                <Star key={j} size={14} className="fill-primary text-primary" />
+                <motion.div
+                  key={j}
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: j * 0.08, duration: 0.3 }}
+                >
+                  <Star size={14} className="fill-primary text-primary" />
+                </motion.div>
               ))}
             </div>
 
@@ -92,7 +129,13 @@ const TestimonialsSection = () => {
               "{t.text}"
             </p>
 
-            <div className="metallic-line mb-4" />
+            <motion.div
+              className="metallic-line mb-4"
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            />
 
             <div>
               <p className="font-body text-sm text-foreground tracking-wide">{t.name}</p>

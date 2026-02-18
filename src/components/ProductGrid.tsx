@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, Heart } from "lucide-react";
 
 interface ProductGridProps {
   activeCategory: string;
@@ -28,7 +28,15 @@ const ProductGrid = ({ activeCategory }: ProductGridProps) => {
     : products.filter(p => p.category === activeCategory);
 
   return (
-    <section className="relative py-24 px-6 md:px-10" id="products">
+    <section className="relative py-24 px-6 md:px-10 overflow-hidden" id="products">
+      {/* Background ambient */}
+      <motion.div
+        className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(ellipse, hsl(var(--royal-blue-light) / 0.08), transparent 70%)" }}
+        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      />
+
       <div className="max-w-7xl mx-auto">
         <motion.div
           className="text-center mb-16"
@@ -37,30 +45,44 @@ const ProductGrid = ({ activeCategory }: ProductGridProps) => {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="font-display text-3xl md:text-5xl text-foreground">
+          <motion.h2
+            className="font-display text-3xl md:text-5xl text-foreground"
+            initial={{ opacity: 0, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, filter: "blur(0px)" }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
             {activeCategory === "Shop" ? "Featured Collection" : activeCategory === "New" ? "New Arrivals" : activeCategory}
-          </h2>
-          <div className="metallic-line max-w-xs mx-auto mt-6" />
+          </motion.h2>
+          <motion.div
+            className="metallic-line max-w-xs mx-auto mt-6"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          />
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           <AnimatePresence mode="popLayout">
-            {filtered.map((product) => (
+            {filtered.map((product, index) => (
               <motion.div
                 key={product.id}
                 layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4 }}
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
                 className="group glass-panel rounded-lg overflow-hidden cursor-pointer"
-                whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                whileHover={{ y: -8, transition: { duration: 0.3, ease: "easeOut" } }}
               >
                 <div className="relative aspect-[3/4] overflow-hidden">
-                  <img
+                  <motion.img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="w-full h-full object-cover"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.7 }}
                     loading="lazy"
                   />
                   <div
@@ -71,33 +93,62 @@ const ProductGrid = ({ activeCategory }: ProductGridProps) => {
                   />
 
                   {product.tag && (
-                    <span className="absolute top-3 left-3 bg-primary text-primary-foreground font-body text-[10px] tracking-luxury uppercase px-3 py-1 rounded-sm">
+                    <motion.span
+                      className="absolute top-3 left-3 bg-primary text-primary-foreground font-body text-[10px] tracking-luxury uppercase px-3 py-1 rounded-sm"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: 0.3 }}
+                    >
                       {product.tag}
-                    </span>
+                    </motion.span>
                   )}
 
                   {product.remaining && (
-                    <span className="absolute top-3 right-3 font-body text-[11px] tracking-wide text-primary font-medium">
+                    <motion.span
+                      className="absolute top-3 right-3 font-body text-[11px] tracking-wide text-primary font-medium"
+                      animate={{ opacity: [0.6, 1, 0.6] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
                       Only <span className="text-primary font-semibold">{product.remaining}</span> left
-                    </span>
+                    </motion.span>
                   )}
 
-                  {/* Quick add button */}
-                  <motion.button
-                    className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <ShoppingBag size={16} />
-                  </motion.button>
+                  {/* Action buttons */}
+                  <div className="absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <motion.button
+                      className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center text-foreground/70 hover:text-primary transition-colors duration-300"
+                      whileHover={{ scale: 1.15 }}
+                      whileTap={{ scale: 0.9 }}
+                      initial={{ y: 10, opacity: 0 }}
+                      whileInView={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      <Heart size={15} />
+                    </motion.button>
+                    <motion.button
+                      className="w-10 h-10 rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center text-primary-foreground"
+                      whileHover={{ scale: 1.15 }}
+                      whileTap={{ scale: 0.9 }}
+                      initial={{ y: 10, opacity: 0 }}
+                      whileInView={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.15 }}
+                    >
+                      <ShoppingBag size={15} />
+                    </motion.button>
+                  </div>
                 </div>
 
-                <div className="p-4">
-                  <h3 className="font-body text-sm text-foreground tracking-wide">{product.name}</h3>
+                <motion.div
+                  className="p-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <h3 className="font-body text-sm text-foreground tracking-wide group-hover:text-primary transition-colors duration-300">{product.name}</h3>
                   <p className="font-body text-xs text-muted-foreground mt-1">
                     KWD {product.price.toLocaleString()}
                   </p>
-                </div>
+                </motion.div>
               </motion.div>
             ))}
           </AnimatePresence>
