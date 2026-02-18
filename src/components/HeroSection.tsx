@@ -46,7 +46,7 @@ const HeroSection = () => {
           className="font-display text-5xl md:text-7xl lg:text-8xl text-foreground tracking-wide"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 4.5, ease: "easeOut" }}
+          transition={{ duration: 1, delay: 8.5, ease: "easeOut" }}
         >
           Step Into Modern Luxury.
         </motion.h1>
@@ -55,7 +55,7 @@ const HeroSection = () => {
           className="font-body text-sm md:text-base text-muted-foreground tracking-luxury uppercase mt-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 5 }}
+          transition={{ duration: 0.8, delay: 9 }}
         >
           Trusted globally since 2009.
         </motion.p>
@@ -64,7 +64,8 @@ const HeroSection = () => {
           className="btn-royal mt-10 animate-pulse-glow"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 5.3 }}
+          transition={{ duration: 0.8, delay: 9.3 }}
+          onClick={() => document.getElementById("products")?.scrollIntoView({ behavior: "smooth" })}
         >
           Shop Now
         </motion.button>
@@ -73,7 +74,7 @@ const HeroSection = () => {
           className="font-body text-xs text-metallic tracking-widest mt-16 italic"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 5.6 }}
+          transition={{ duration: 0.8, delay: 9.6 }}
         >
           Not mass produced. Precisely chosen.
         </motion.p>

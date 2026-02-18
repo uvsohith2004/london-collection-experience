@@ -1,20 +1,47 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ShoppingBag, Menu, X } from "lucide-react";
+import { Search, ShoppingBag, Menu, X, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const NAV_ITEMS = ["Shop", "New", "Women", "Men", "Jewelry", "Watches", "Gifts"];
 
-const Navbar = () => {
+interface NavbarProps {
+  activeItem: string;
+  onItemChange: (item: string) => void;
+}
+
+const Navbar = ({ activeItem, onItemChange }: NavbarProps) => {
   const [scrolled, setScrolled] = useState(false);
-  const [activeItem, setActiveItem] = useState("Shop");
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => setUser(session?.user ?? null));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleNavClick = (item: string) => {
+    onItemChange(item);
+    setMobileOpen(false);
+    document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
 
   return (
     <motion.nav
@@ -25,7 +52,7 @@ const Navbar = () => {
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.6, delay: 4.3 }}
+      transition={{ duration: 0.6, delay: 8.3 }}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
         {/* Logo */}
@@ -43,7 +70,7 @@ const Navbar = () => {
           {NAV_ITEMS.map((item) => (
             <button
               key={item}
-              onClick={() => setActiveItem(item)}
+              onClick={() => handleNavClick(item)}
               className="relative font-body text-xs tracking-luxury uppercase text-foreground/70 hover:text-foreground transition-colors duration-300 pb-1"
             >
               {item}
@@ -75,6 +102,21 @@ const Navbar = () => {
               0
             </span>
           </button>
+          {user ? (
+            <button
+              onClick={handleSignOut}
+              className="text-foreground/70 hover:text-foreground transition-colors duration-300 font-body text-xs tracking-luxury uppercase"
+            >
+              Sign Out
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate("/auth")}
+              className="text-foreground/70 hover:text-foreground transition-colors duration-300"
+            >
+              <User size={18} />
+            </button>
+          )}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="md:hidden text-foreground/70 hover:text-foreground transition-colors"
@@ -119,7 +161,7 @@ const Navbar = () => {
               {NAV_ITEMS.map((item) => (
                 <button
                   key={item}
-                  onClick={() => { setActiveItem(item); setMobileOpen(false); }}
+                  onClick={() => handleNavClick(item)}
                   className={`font-body text-sm tracking-luxury uppercase text-left py-2 transition-colors duration-300 ${
                     activeItem === item ? "text-royal-red" : "text-foreground/70"
                   }`}
